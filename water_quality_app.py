@@ -11,7 +11,7 @@ def categorize_water(color, turbidity, viscosity, ph):
         "reddish brown": ("Toxic", "High iron content; consider aeration and iron removal filters."),
         "black": ("Highly Toxic", "Possible sewage contamination; avoid use, requires extensive treatment.")
     }
-    
+
     turbidity_level = "Low" if turbidity < 5 else "Medium" if turbidity < 50 else "High"
     viscosity_level = "Low" if viscosity < 10 else "Medium" if viscosity < 50 else "High"
 
@@ -28,23 +28,54 @@ def categorize_water(color, turbidity, viscosity, ph):
     category, suggestion = categories.get(color, ("Unknown", "No data available for this color."))
     return category, suggestion, turbidity_level, viscosity_level, ph_status, ph_color
 
-# --- Streamlit App ---
+# Streamlit App Config
 st.set_page_config(page_title="AquaScan", layout="wide")
 
-# Custom Background Styling
+# Elegant Background & Component Styling
 st.markdown("""
 <style>
     .stApp {
-        background: linear-gradient(to right, #f0f9ff, #ffffff);
-        font-family: 'Arial', sans-serif;
+        background: linear-gradient(to right, #e0f7fa, #ffffff);
+        font-family: 'Segoe UI', sans-serif;
+        color: #333333;
+    }
+    .block-container {
+        padding: 2rem 3rem;
+    }
+    .stSidebar {
+        background-color: #1e1e1e !important;
+        color: white;
+    }
+    .stSlider > div[data-baseweb="slider"] {
+        margin-top: 10px;
+    }
+    .stSelectbox label, .stSlider label {
+        color: white !important;
+        font-weight: 600;
+    }
+    .stButton button {
+        background-color: #007acc;
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+        font-weight: bold;
+    }
+    .stButton button:hover {
+        background-color: #005f99;
+    }
+    .result-card {
+        background-color: rgba(255,255,255,0.85);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 </style>
 """, unsafe_allow_html=True)
 
 st.title("🌊 Water Quality Analyzer")
-st.markdown("Analyze water samples based on color, turbidity, viscosity, and pH level.")
+st.markdown("Analyze water samples based on **color**, **turbidity**, **viscosity**, and **pH level**.")
 
-# Sidebar Inputs
+# Sidebar
 with st.sidebar:
     st.header("Input Parameters")
     color = st.selectbox("Water Color", ["clear", "yellow", "cloudy", "green", "reddish brown", "black"])
@@ -52,6 +83,7 @@ with st.sidebar:
     viscosity = st.slider("Viscosity Index", 5, 110, 15)
     ph = st.slider("pH Level", 0.0, 14.0, 7.0, step=0.1)
 
+# Analysis and Result Display
 if st.button("Analyze Sample"):
     category, suggestion, turbidity_level, viscosity_level, ph_status, ph_color = categorize_water(
         color, turbidity, viscosity, ph
@@ -62,15 +94,17 @@ if st.button("Analyze Sample"):
 
     with col1:
         st.markdown(f"""
-        **Category:**  
+        <div class='result-card'>
+        <h4>Category:</h4>
         <span style='color: {"red" if "Toxic" in category else "orange" if "Harmful" in category else "green"}'>
         {category}</span><br><br>
-        
-        **Suggestion:**  
+
+        <h4>Suggestion:</h4>
         {suggestion}<br><br>
-        
-        **pH Status:**  
-        <span style='color:{ph_color}'>{ph_status}</span>
+
+        <h4>pH Status:</h4>
+        <span style='color:{ph_color}; font-weight:bold'>{ph_status}</span>
+        </div>
         """, unsafe_allow_html=True)
 
     with col2:
@@ -83,7 +117,7 @@ if st.button("Analyze Sample"):
         ax.set_ylabel("Value")
         for bar in bars:
             height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2., height, f'{height:.1f}', ha='center', va='bottom')
+            ax.text(bar.get_x() + bar.get_width() / 2., height, f'{height:.1f}', ha='center', va='bottom')
         st.pyplot(fig)
 
     if color == "black":
